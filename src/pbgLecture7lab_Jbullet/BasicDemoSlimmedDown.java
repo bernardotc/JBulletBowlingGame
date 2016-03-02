@@ -55,6 +55,7 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
+import javax.swing.JTextField;
 //import com.sun.javafx.geom.Vec3f;
 
 /**
@@ -65,14 +66,17 @@ import com.bulletphysics.util.ObjectArrayList;
 public class BasicDemoSlimmedDown extends JBulletGame3d {
 
 	// create 125 (5x5x5) dynamic object
-	private static final int ARRAY_SIZE_X = 3;
+	private static final int ARRAY_SIZE_X = 2;
 	private static final int ARRAY_SIZE_Y = 1;
-	private static final int ARRAY_SIZE_Z = 3;
+	private static final int ARRAY_SIZE_Z = 5;
 
 
-	private static final int START_POS_X = -5;
-	private static final int START_POS_Y = -14;
-	private static final int START_POS_Z = -5;
+	private static final int START_POS_X = 0;
+	private static final int START_POS_Y = -4;
+	private static final int START_POS_Z = 5;
+        
+        private static JTextField speed;
+        private static JTextField spin;
 
 	// keep the collision shapes, for deletion/cleanup
 	private ObjectArrayList<CollisionShape> collisionShapes = new ObjectArrayList<CollisionShape>();
@@ -168,25 +172,52 @@ public class BasicDemoSlimmedDown extends JBulletGame3d {
 			float start_y = START_POS_Y;
 			float start_z = START_POS_Z - ARRAY_SIZE_Z / 2;
 
-			for (int k = 0; k < ARRAY_SIZE_Y; k++) {
-				for (int i = 0; i < ARRAY_SIZE_X; i++) {
-					for (int j = 0; j < ARRAY_SIZE_Z; j++) {
-						startTransform.origin.set(
-								2f * i + start_x,
-								10f + 2f * k + start_y,
-								2f * j + start_z);
+			for (int k = 0; k < 10; k++) {
+                            switch (k) {
+                                case 0: {
+                                    startTransform.origin.set(start_x, start_y, start_z);
+                                    break;
+                                } case 1: {
+                                    startTransform.origin.set(start_x - 2, start_y, start_z + 4);
+                                    break;
+                                } case 2: {
+                                    startTransform.origin.set(start_x + 2, start_y, start_z + 4);
+                                    break;
+                                } case 3: {
+                                    startTransform.origin.set(start_x - 4, start_y, start_z + 8);
+                                    break;
+                                } case 4: {
+                                    startTransform.origin.set(start_x, start_y, start_z + 8);
+                                    break;
+                                } case 5: {
+                                    startTransform.origin.set(start_x + 4, start_y, start_z + 8);
+                                    break;
+                                } case 6: {
+                                    startTransform.origin.set(start_x - 5, start_y, start_z + 12);
+                                    break;
+                                } case 7: {
+                                    startTransform.origin.set(start_x - 2, start_y, start_z + 12);
+                                    break;
+                                } case 8: {
+                                    startTransform.origin.set(start_x + 2, start_y, start_z + 12);
+                                    break;
+                                } case 9: {
+                                    startTransform.origin.set(start_x + 5, start_y, start_z + 12);
+                                    break;
+                                }
+                            }
 
-						// using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-						DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
-						RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, colShape, localInertia);
-						RigidBody body = new RigidBody(rbInfo);
-						body.setActivationState(RigidBody.ISLAND_SLEEPING);
+                                // using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+                                DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
+                                RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, colShape, localInertia);
+                                RigidBody body = new RigidBody(rbInfo);
+                                body.setActivationState(RigidBody.ISLAND_SLEEPING);
 
-						dynamicsWorld.addRigidBody(body);
-						body.setActivationState(RigidBody.ISLAND_SLEEPING);
-					}
-				}
-			}
+                                dynamicsWorld.addRigidBody(body);
+                                body.setActivationState(RigidBody.ISLAND_SLEEPING);
+                        }
+				
+			
                                          
 		}
 
@@ -205,12 +236,16 @@ public class BasicDemoSlimmedDown extends JBulletGame3d {
 		sidePanel.setLayout(new FlowLayout());
 		final JButton jButton_go=new JButton("Go");
 		sidePanel.add(jButton_go);
+                // add any new buttons or textfields to side panel here...
+                speed = new JTextField("50.0");
+                spin = new JTextField("20.0");
+                sidePanel.add(speed);
+                sidePanel.add(spin);
 		containerPanel.add(sidePanel, BorderLayout.WEST);
-		// add any new buttons or textfields to side panel here...
 		
 		JComponent topPanel=new JPanel();
 		topPanel.setLayout(new FlowLayout());
-		topPanel.add(new JLabel("Text"));
+		topPanel.add(new JLabel("Bowling game"));
 		containerPanel.add(topPanel, BorderLayout.NORTH);
 		
 		
@@ -255,14 +290,14 @@ public class BasicDemoSlimmedDown extends JBulletGame3d {
                 if (isDynamic) {
                         colShape.calculateLocalInertia(mass, localInertia);
                 }
-                startTransform.origin.set(START_POS_X -5, START_POS_Y + 10, START_POS_Z - 30);
+                startTransform.origin.set(START_POS_X -5, START_POS_Y, START_POS_Z - 30);
 
                 // using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
                 DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
                 RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, colShape, localInertia);
                 RigidBody body = new RigidBody(rbInfo);
-                body.setLinearVelocity(new Vector3f(0, 0, 50f));
-                body.setAngularVelocity(new Vector3f(0, 0, 20f));
+                body.setLinearVelocity(new Vector3f(0, 0, Float.parseFloat(speed.getText())));
+                body.setAngularVelocity(new Vector3f(0, 0, Float.parseFloat(spin.getText())));
 
                 dynamicsWorld.addRigidBody(body);
                 
